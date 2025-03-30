@@ -24,7 +24,13 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
     return productInserted;
   }
 
-  async findAll(pagination: PaginationDto) {
+  async findAll({
+    pagination,
+    onlyActive = false,
+  }: {
+    pagination: PaginationDto;
+    onlyActive?: boolean;
+  }) {
     const { page = 1, limit = 10 } = pagination;
     const skip = (page - 1) * limit;
     const totalPages = await this.product.count();
@@ -35,6 +41,9 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
       take: limit,
       orderBy: {
         id: 'asc',
+      },
+      where: {
+        active: onlyActive ? true : undefined,
       },
     });
 
@@ -61,7 +70,7 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
 
   async update(id: number, updateProductDto: UpdateProductDto) {
     const existProduct = await this.findOne(id); // Check if the product exists before updating
-    
+
     if (!existProduct) {
       Logger.warn(`Product with id ${id} not found`, this.constructor.name);
       throw new NotFoundException(`Product with id ${id} not found`);
@@ -74,7 +83,13 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
   }
 
   async remove(id: number) {
-    return await this.product.delete({
+    const existProduct = await this.findOne(id); // Check if the product exists before deleting
+    if (!existProduct) {
+      Logger.warn(`Product with id ${id} not found`, this.constructor.name);
+      throw new NotFoundException(`Product with id ${id} not found`);
+    }
+    return await this.product.update({
+      data: { active: false },
       where: { id },
     });
   }

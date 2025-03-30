@@ -11,7 +11,7 @@ import {
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { ActiveRecordsDto } from 'src/common/dto/activeRecords.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -23,8 +23,12 @@ export class ProductsController {
   }
 
   @Get()
-  findAll(@Query() query: PaginationDto) {
-    return this.productsService.findAll(query);
+  findAll(@Query() query: ActiveRecordsDto) {
+    const { page, limit, onlyActive } = query;
+    return this.productsService.findAll({
+      pagination: { page, limit },
+      onlyActive,
+    });
   }
 
   @Get(':id')
