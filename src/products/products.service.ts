@@ -76,9 +76,11 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
       throw new NotFoundException(`Product with id ${id} not found`);
     }
 
+    const { id: __, ...data } = updateProductDto; // Destructure to remove id from the update object
+
     return await this.product.update({
       where: { id },
-      data: updateProductDto,
+      data,
     });
   }
 
