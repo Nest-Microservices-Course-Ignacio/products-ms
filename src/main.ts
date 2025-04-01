@@ -23,6 +23,8 @@ async function bootstrap() {
     }),
   );
 
+  await app.listen()
+
   console.log(`Products MS running on port ${envs.port}`);
 }
 bootstrap();

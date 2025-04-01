@@ -1,13 +1,9 @@
-import {
-  Injectable,
-  Logger,
-  NotFoundException,
-  OnModuleInit,
-} from '@nestjs/common';
+import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class ProductsService extends PrismaClient implements OnModuleInit {
@@ -62,8 +58,12 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
       where: { id },
     });
     if (!data) {
-      Logger.warn(`Product with id ${id} not found`, this.constructor.name);
-      throw new NotFoundException(`Product with id ${id} not found`);
+      Logger.error(`Product with id ${id} not found`, this.constructor.name);
+      // throw new NotFoundException(`Product with id ${id} not found`);
+      throw new RpcException({
+        message: `Product with id #${id} not found`,
+        status: HttpStatus.NOT_FOUND,
+      });
     }
     return data;
   }
@@ -72,8 +72,9 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
     const existProduct = await this.findOne(id); // Check if the product exists before updating
 
     if (!existProduct) {
-      Logger.warn(`Product with id ${id} not found`, this.constructor.name);
-      throw new NotFoundException(`Product with id ${id} not found`);
+      Logger.error(`Product with id ${id} not found`, this.constructor.name);
+      // throw new NotFoundException(`Product with id ${id} not found`);
+      throw new RpcException(`Product with id ${id} not found`); // Use RpcException for microservices
     }
 
     const { id: __, ...data } = updateProductDto; // Destructure to remove id from the update object
@@ -87,8 +88,12 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
   async remove(id: number) {
     const existProduct = await this.findOne(id); // Check if the product exists before deleting
     if (!existProduct) {
-      Logger.warn(`Product with id ${id} not found`, this.constructor.name);
-      throw new NotFoundException(`Product with id ${id} not found`);
+      Logger.error(`Product with id ${id} not found`, this.constructor.name);
+      // throw new NotFoundException(`Product with id ${id} not found`);
+      throw new RpcException({
+        message: `Product with id #${id} not found`,
+        status: HttpStatus.NOT_FOUND,
+      });
     }
     return await this.product.update({
       data: { active: false },
