@@ -8,9 +8,9 @@ async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
     {
-      transport: Transport.TCP,
+      transport: Transport.NATS,
       options: {
-        port: envs.port,
+        servers: envs.natsServers,
       },
     },
   );
@@ -23,7 +23,7 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen()
+  await app.listen();
 
   console.log(`Products MS running on port ${envs.port}`);
 }
