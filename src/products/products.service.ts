@@ -7,9 +7,9 @@ import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductsService extends PrismaClient implements OnModuleInit {
-  onModuleInit() {
+  async onModuleInit() {
     Logger.log('Prisma Client is connected...', this.constructor.name);
-    this.$connect();
+    await this.$connect();
   }
 
   async create(createProductDto: CreateProductDto) {
