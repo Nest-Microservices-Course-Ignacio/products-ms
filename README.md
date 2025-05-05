@@ -12,3 +12,12 @@
 
 1. Abrir un administrador de base de datos (e.g. DBeaver)
 2. Usar el archivo `/prisma/backup/products-ms.sql` para agregar data a la tabla.
+
+
+## Build de Producción
+
+Construir imagen de docker con el tag `:prod` y utilizando el `Dockerfile.prod`
+ejemplo:
+```
+docker build -f Dockerfile.prod -t products-ms:prod .
+```
